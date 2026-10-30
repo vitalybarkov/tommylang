@@ -1,0 +1,21 @@
+main () {
+    // list
+    users = @c<@s> { 'Alice', 'Bob', 'Charlie' }
+    
+    // dictionary (MUST use '=')
+    user_ages = @map<@s, @i32> { 
+        'Alice' = 25, 
+        'Bob' = 30 
+    }
+    
+    // hash set
+    unique_ids = @set<@i32> { 1, 2, 3, 2, 1 }
+    
+    // queue
+    tasks = @queue<@s> { 'task1', 'task2' }
+    
+    // map iteration
+    & name; user_ages {
+        render(name + ' is ' + user_ages[name] + ' years old')
+    }
+}

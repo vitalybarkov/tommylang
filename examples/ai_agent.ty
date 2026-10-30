@@ -1,0 +1,28 @@
+@struct user_features {
+    age = @i32 0
+    spend = @f64 0.0
+}
+
+[ML]
+@ChurnPredictor {
+    predict (@user_features user) {
+        model = @ml.xgboost(target = 'churn', features = ['age', 'spend'])
+        score = ~model.predict(user)
+        <= score
+    }
+}
+
+[Agent]
+@CustomerSupport {
+    tools = @c<@s> { 'refund', 'check_status' }
+    
+    handle_query (@s question) {
+        ?try {
+            response = ~llm.complete('User asks: ' + question)
+            <= ok(response)
+        }
+        :ex (e) {
+            <= server_error('LLM unavailable')
+        }
+    }
+}

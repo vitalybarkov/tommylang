@@ -1,0 +1,29 @@
+#IUserService {
+    get_user (@i32 id) {@User?}
+}
+
+[UML]
+@UserService : #IUserService {
+    // auto property
+    base_url = @p @s 
+    
+    // property with logic
+    status = @p {
+        get () {@s}
+        set (@s val) {
+            ? val == 'active' {
+                <= 'active'
+            }
+            : {
+                <= 'inactive'
+            }
+        }
+    }
+    
+    // implementation (no return type in signature)
+    get_user (@i32 id) {
+        // Vibe mode will auto-generate the DB call
+        user = ~@db.query<@User>('SELECT * FROM users WHERE id = @id', { id = id })
+        <= user
+    }
+}

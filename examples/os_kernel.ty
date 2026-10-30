@@ -1,0 +1,18 @@
+[NoRuntime]
+[Ring(0)]
+[Interrupt]
+handle_network_irq (@i32 irq_num) {
+    unsafe {
+        // Read from Memory-Mapped I/O
+        [MMIO(addr = '0xFF00A000')]
+        status_reg = @ptr<@i32> 0xFF00A000
+        
+        ? *status_reg == 1 {
+            // Acknowledge interrupt
+            *status_reg = 0
+            
+            // Call external C function
+            extern 'kernel32.dll' ack_interrupt(@i32 irq_num)
+        }
+    }
+}

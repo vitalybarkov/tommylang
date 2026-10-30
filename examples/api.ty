@@ -1,0 +1,24 @@
+@struct create_user_dto {
+    email = @s ''
+    age = @i32 0
+}
+
+[REST('/api/users')]
+[Auth(oauth2 = 'client_credentials')]
+[Cache(ttl = 60s)]
+[RateLimit(requests = 10, per = '1m')]
+[Telemetry]
+[Test]
+create_user (@create_user_dto user) {
+    ? user.age < 18 {
+        <= bad_request('User must be 18 or older')
+    }
+    
+    ? user.email == '' {
+        <= bad_request('Email is required')
+    }
+    
+    @db.query('INSERT INTO users (email, age) VALUES (@email, @age)', { email = user.email, age = user.age })
+    
+    <= created('User created')
+}

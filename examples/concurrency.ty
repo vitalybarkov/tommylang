@@ -1,0 +1,30 @@
+@worker {
+    counter = @i32 0
+    
+    increment () {
+        @lock(mutex) {
+            this.counter = this.counter + 1
+        }
+    }
+}
+
+main () {
+    w = @worker {}
+    
+    // spawn 10 background tasks
+    futures = @c<@Future> {}
+    & i = 0; i < 10; i++ {
+        fut = ~[Spawn] w.increment()
+        futures.add(fut)
+    }
+    
+    // wait for all
+    ~@all(futures)
+    render('Counter: ' + w.counter)
+    
+    // channels
+    channel = @channel<@s> { capacity = 5 }
+    ~channel.send('Hello')
+    msg = ~channel.receive()
+    render(msg)
+}

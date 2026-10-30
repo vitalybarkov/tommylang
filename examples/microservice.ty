@@ -1,0 +1,28 @@
+[REST('/api/orders')]
+[Saga]
+[Outbox]
+[Idempotent(key = 'order_id')]
+[CircuitBreaker(failures = 5, reset = 30s)]
+[Timeout(ms = 3000)]
+create_order (@order_dto order) {
+    ?try {
+        // 1. charge payment (external service)
+        payment = ~@payment_service.charge(order.total)
+        
+        ? !payment.success {
+            throw @PaymentFailed('Card declined')
+        }
+        
+        // 2. save to DB (transactional outbox)
+        @db.query('INSERT INTO orders (id, total) VALUES (@id, @total)', { id = order.id, total = order.total })
+        
+        // 3. publish event to Kafka
+        [Kafka(topic = 'order_events')].publish({ id = order.id, status = 'created' })
+        
+        <= ok('Order created')
+    }
+    :ex (e) {
+        log(e.message)
+        <= server_error('Order failed')
+    }
+}
