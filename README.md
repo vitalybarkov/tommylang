@@ -1,4 +1,9 @@
-# 🏛 tommylang (Tommy): The Universal Architecture Language
+<table>
+  <tr>
+    <td><img src="TommyLangAvatar.png" width="80" alt="Tommy Logo"></td>
+    <td><h1>🏛 tommylang (Tommy): The Universal Architecture Language</h1></td>
+  </tr>
+</table>
 
 [![VS Code Theme](https://img.shields.io/badge/VS%20Code-TommyColor-blue?style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=TommyStore.tommycolor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
