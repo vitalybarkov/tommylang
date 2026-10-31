@@ -71,7 +71,12 @@ say_hello (@user_dto user) {
 
 ### Step 3: Transpile to Target Language
 
-**Option A: Using the CLI (Recommended)**
+**Option A: Manual AI Use (No Setup)**
+1. Open ChatGPT or Claude.
+2. Copy the contents of **[`COMPILER_PROMPT.md`](COMPILER_PROMPT.md)** and paste it as a System Prompt.
+3. Paste your `main.ty` code and add the instruction: *"Target: C#"*.
+
+**Option B: Using the CLI (Recommended)**
 "One command — ready code."
 1. Clone the repo and navigate to `cd cli`.
 2. Install the compiler: `pip install -e .`
@@ -79,11 +84,6 @@ say_hello (@user_dto user) {
 4. Run the compiler: `tommycli main.ty --target csharp`
 
 *(Read the full [CLI documentation here](cli/README.md)).*
-
-**Option B: Manual AI Use (No Setup)**
-1. Open ChatGPT or Claude.
-2. Copy the contents of **[`COMPILER_PROMPT.md`](COMPILER_PROMPT.md)** and paste it as a System Prompt.
-3. Paste your `main.ty` code and add the instruction: *"Target: C#"*.
 
 **The AI will generate:**
 1. A `<pre-flight>` architecture plan (checking security, DI scopes).
