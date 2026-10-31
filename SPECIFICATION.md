@@ -103,6 +103,8 @@ Do not declare these. The AI compiler maps them to the target language's HTTP/gR
 *   `conflict(msg)` -> HTTP 409
 *   `server_error(msg)` -> HTTP 500
 
+*Note: Infrastructure services like `@db`, `@cache`, `@channel`, and `@ptr` are treated as AI Ambient Intents. The AI compiler automatically maps them to the appropriate database drivers, caching clients, or concurrency primitives in the target language.*
+
 ---
 
 ## 🏛 6. Architecture Attributes (`[...]`)

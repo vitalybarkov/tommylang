@@ -28,6 +28,8 @@ Instead of writing boilerplate code, you write **Architectural Blueprints** (`.t
 4. [Core Features](#-core-features)
 5. [Examples](#-examples)
 6. [Repository Structure](#-repository-structure)
+7. [Roadmap](#-roadmap)
+8. [Contributing](#-contributing)
 
 ---
 
@@ -100,6 +102,20 @@ Tommy is built on top of a meticulously crafted **System Prompt**.
 
 Because the prompt enforces strict rules (e.g., snake_case for functions, = for all data, no return types in implementations), the AI is forced to generate code that is identical in architecture across all target languages. While LLMs are still probabilistic, this Strict-API approach minimizes hallucinations to near zero.
 
+### The Difference: Plain AI vs. Tommy
+If you ask ChatGPT to build a microservice with Kafka, it generates 500 lines of boilerplate with missing dependencies. 
+
+With Tommy, you write this:
+```tommy
+[Kafka(topic = 'orders')]
+[Saga]
+process_order (@order_dto order) {
+    @db.query('INSERT INTO orders ...', { id = order.id })
+    [Event('order_created')].publish({ id = order.id })
+    <= ok('Processed')
+}
+```
+
 **Why not just use C# directly?**
 If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-specific paradigms (`Task`, `var`, DI attributes). It often fails. Tommy is a clean, abstract blueprint. It contains zero language-specific boilerplate. The AI translates pure intent directly into the target language's idiomatic code.
 
@@ -137,6 +153,16 @@ Explore the power of Tommy in the [`examples/`](examples/) folder:
 *   **[SPECIFICATION.md](SPECIFICATION.md)** — The strict syntax and architectural rules of Tommy.
 *   `examples/` — 8 production-ready `.ty` blueprints (from Basics to OS Kernel).
 *   `cli/` — The `tommycli` compiler (Python). [Read the CLI Docs here](cli/README.md).
+
+---
+
+## 🗺 Roadmap
+
+Tommy is in early alpha. Here is what's coming next:
+* [ ] **Formal Grammar (BNF):** A strict grammar specification for `.ty` files.
+* [ ] **LSP & Validator:** A Language Server to catch syntax errors before sending code to the LLM.
+* [ ] **Multi-LLM Support:** Native support for Claude 3.5, Gemini Pro, and local models (Ollama) in `tommycli`.
+* [ ] **CI/CD Tests:** Automated compilation tests for generated code.
 
 ---
 
