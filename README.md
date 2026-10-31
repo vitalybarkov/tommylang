@@ -33,7 +33,7 @@ Instead of writing boilerplate code, you write **Architectural Blueprints** (`.t
 
 ## 🚀 Why Tommy?
 
-1. **Zero-Hallucination Compiler:** Our prompt forces LLMs (GPT-4o, Claude 3.5) to act as strict AST compilers, not text generators.
+1. **Hallucination-Resistant:** Our prompt forces LLMs (GPT-4o, Claude 3.5) to act as strict AST compilers, not text generators.
 2. **Polyglot by Design:** Write once in `.ty`, transpile to C#, Python, Rust, Go, PHP, TypeScript, Solidity, and more.
 3. **Enterprise-Ready:** Built-in annotations for `[Saga]`, `[Outbox]`, `[GDPR]`, `[Kafka]`, and `[Telemetry]`.
 4. **Semantic Typography:** The official `TommyColor` VS Code theme uses color to separate Interfaces (Purple), Classes (Green), and Functions (Blue).
@@ -98,7 +98,7 @@ Tommy is built on top of a meticulously crafted **System Prompt**.
 [Your .ty code] + [Tommy System Prompt] ---> [LLM] ---> [Clean Target Code + UML]
 ```
 
-Because the prompt enforces strict rules (e.g., `snake_case` for functions, `=` for all data, no return types in implementations), the AI is forced to generate code that is identical in architecture across all target languages.
+Because the prompt enforces strict rules (e.g., snake_case for functions, = for all data, no return types in implementations), the AI is forced to generate code that is identical in architecture across all target languages. While LLMs are still probabilistic, this Strict-API approach minimizes hallucinations to near zero.
 
 **Why not just use C# directly?**
 If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-specific paradigms (`Task`, `var`, DI attributes). It often fails. Tommy is a clean, abstract blueprint. It contains zero language-specific boilerplate. The AI translates pure intent directly into the target language's idiomatic code.
