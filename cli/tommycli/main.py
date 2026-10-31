@@ -2,10 +2,10 @@ import os
 import sys
 import argparse
 import re
+import json
 from openai import OpenAI
 
 # Determine the path to the COMPILER_PROMPT.md 
-# We assume the user runs it from the root of the tommylang repo
 PROMPT_FILE = "COMPILER_PROMPT.md"
 
 def load_system_prompt():
@@ -38,7 +38,7 @@ def main():
         print("Set it using: export OPENAI_API_KEY='your-key-here'")
         sys.exit(1)
 
-    print(f"🏛  tommylang compiler v0.1.0")
+    print(f"🏛  tommylang compiler v0.2.0 (Compliance Edition)")
     print(f"📄 Blueprint: {args.file}")
     print(f"🎯 Target: {args.target.upper()}")
     print(f"🤖 Engine: {args.model}")
@@ -75,18 +75,33 @@ def main():
         
         # Extract JSON trace if requested
         if args.trace and "```json" in output:
-            # Extract JSON block using regex
             json_match = re.search(r"```json\n(.*?)\n```", output, re.DOTALL)
             if json_match:
-                trace_json = json_match.group(1)
+                trace_json_str = json_match.group(1)
                 trace_filename = os.path.join("output", f"{os.path.basename(args.file).split('.')[0]}.trace.json")
                 
                 with open(trace_filename, "w", encoding="utf-8") as f:
-                    f.write(trace_json)
+                    f.write(trace_json_str)
                 
                 print(f"🔍 Trace file saved to: {trace_filename}")
                 
-                # Remove JSON from the main output so the markdown file stays clean
+                # --- COMPLIANCE CHECK ---
+                try:
+                    trace_data = json.loads(trace_json_str)
+                    missing = [t for t in trace_data.get("trace", []) if t.get("verification_result") == "MISSING"]
+                    
+                    if missing:
+                        print("\n⚠️  ARCHITECTURE COMPLIANCE VIOLATION DETECTED!")
+                        for m in missing:
+                            print(f"   - Constraint [{m['constraint_id']}] '{m['annotation']}' is MISSING in the generated code.")
+                        print("   Please review the output carefully.\n")
+                    else:
+                        print("✅ Architecture Compliance: All constraints verified.\n")
+                        
+                except json.JSONDecodeError:
+                    print("⚠️ Warning: Could not parse trace JSON for compliance check.")
+
+                # Remove JSON from the main output
                 output = output.replace(json_match.group(0), "")
             else:
                 print("⚠️ Warning: --trace was requested but no JSON block was found in the response.")
