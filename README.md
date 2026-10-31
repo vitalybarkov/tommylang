@@ -1,7 +1,7 @@
 <table border="0" cellspacing="0" cellpadding="10">
   <tr>
     <td valign="middle">
-      <img src="TommyLangAvatar2.jpg" width="360" alt="Tommy Logo">
+      <img src="TommyLangAvatar.png" width="256" alt="Tommy Logo">
     </td>
     <td valign="middle">
       <h1>🏛 tommylang (Tommy): The Universal Architecture Language</h1>
