@@ -130,6 +130,7 @@ If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-
 *   **OS-Level (Bare-Metal):** `[NoRuntime]`, `[Ring(0)]`, `[Interrupt]` -> generates Rust `#![no_std]`.
 *   **AI & ML:** `[ML]`, `[Agent]`, `@llm.complete()`.
 *   **UML Generation:** `[UML]` -> generates Mermaid & PlantUML diagrams on the fly.
+*   **Traceability & Auditing:** Use the `--trace` flag in the CLI to generate a JSON map linking every `.ty` annotation (`[Saga]`, `[Idempotent]`) directly to its generated implementation file and line number.
 
 ---
 

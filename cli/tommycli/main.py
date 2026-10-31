@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import re
 from openai import OpenAI
 
 # Determine the path to the COMPILER_PROMPT.md 
@@ -23,6 +24,7 @@ def main():
     parser.add_argument("file", help="Path to the .ty blueprint file")
     parser.add_argument("--target", default="csharp", help="Target language (csharp, python, rust, go, php)")
     parser.add_argument("--model", default="gpt-4o", help="OpenAI model to use (default: gpt-4o)")
+    parser.add_argument("--trace", action="store_true", help="Generate a traceability JSON mapping annotations to code lines")
     
     args = parser.parse_args()
 
@@ -40,6 +42,8 @@ def main():
     print(f"📄 Blueprint: {args.file}")
     print(f"🎯 Target: {args.target.upper()}")
     print(f"🤖 Engine: {args.model}")
+    if args.trace:
+        print(f"🔍 Traceability: Enabled")
     print("-" * 50)
 
     with open(args.file, "r", encoding="utf-8") as f:
@@ -50,12 +54,16 @@ def main():
 
     print("⏳ Transpiling... (this may take 10-20 seconds)")
 
+    trace_instruction = ""
+    if args.trace:
+        trace_instruction = "\nIMPORTANT: Generate the trace JSON block as instructed in the system prompt."
+
     try:
         response = client.chat.completions.create(
             model=args.model,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Target: {args.target}\n\n{code}"}
+                {"role": "user", "content": f"Target: {args.target}\n{trace_instruction}\n\n{code}"}
             ],
             temperature=0.1
         )
@@ -64,10 +72,30 @@ def main():
 
         # Create output directory
         os.makedirs("output", exist_ok=True)
+        
+        # Extract JSON trace if requested
+        if args.trace and "```json" in output:
+            # Extract JSON block using regex
+            json_match = re.search(r"```json\n(.*?)\n```", output, re.DOTALL)
+            if json_match:
+                trace_json = json_match.group(1)
+                trace_filename = os.path.join("output", f"{os.path.basename(args.file).split('.')[0]}.trace.json")
+                
+                with open(trace_filename, "w", encoding="utf-8") as f:
+                    f.write(trace_json)
+                
+                print(f"🔍 Trace file saved to: {trace_filename}")
+                
+                # Remove JSON from the main output so the markdown file stays clean
+                output = output.replace(json_match.group(0), "")
+            else:
+                print("⚠️ Warning: --trace was requested but no JSON block was found in the response.")
+
+        # Save the main code
         out_filename = os.path.join("output", f"{os.path.basename(args.file).split('.')[0]}.{args.target}.md")
         
         with open(out_filename, "w", encoding="utf-8") as f:
-            f.write(output)
+            f.write(output.strip())
 
         print(f"✅ Success! Output saved to: {out_filename}")
 
