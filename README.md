@@ -12,6 +12,8 @@
 [![VS Code Theme](https://img.shields.io/badge/VS%20Code-TommyColor-blue?style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=TommyStore.tommycolor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/vitalybarkov/tommylang/actions/workflows/test.yml/badge.svg)](https://github.com/vitalybarkov/tommylang/actions/workflows/test.yml)
+[![Hashnode](https://img.shields.io/badge/Blog-Hashnode-blue?logo=hashnode)](https://tommylang.hashnode.dev/)
+[![Dev.to](https://img.shields.io/badge/Blog-Dev.to-black?logo=dev.to)](https://dev.to/vitalybark/i-got-tired-of-ai-writing-500-lines-of-c-boilerplate-so-i-built-a-language-that-forces-it-to-376j)
 
 **Are you tired of AI generating 500 lines of C# with missing dependencies and broken architecture?**
 **Are you spending hours reviewing AI-generated boilerplate?**
