@@ -29,7 +29,7 @@ FunctionDecl    = Identifier "(" [ ParamList ] ")" Block ;
 MainDecl        = "main" "(" [ ParamList ] ")" Block ;
 ParamList       = Param { "," Param } ;
 Param           = [ Modifier ] TypeRef Identifier ;
-Modifier        = "out" | "@in" | "ref" ;
+Modifier        = "out" | "in" | "ref" ;
 
 (* Properties *)
 PropertyDecl    = Identifier "=" "@p" ( TypeRef | "{" Getter Setter "}" ) ;
