@@ -13,7 +13,7 @@ Dependency      = "dependency" StringLit "{" "version" "=" StringLit "}" ;
 
 (* Attributes *)
 AttributeStmt   = "[" Identifier [ "(" { AttrArg } ")" ] "]" ;
-AttrArg         = Identifier "=" ( StringLit | NumberLit | BoolLit ) ;
+AttrArg         = Identifier "=" ( StringLit | NumberLit | BoolLit | Identifier ) ;
 
 (* Declarations *)
 InterfaceDecl   = "#" Identifier "{" { Signature } "}" ;
@@ -43,10 +43,13 @@ CollectionType  = "@c" | "@map" | "@set" | "@queue" ;
 
 (* Blocks and Statements *)
 Block           = "{" { Statement } "}" ;
-ControlFlow     = IfStmt | LoopStmt | TryStmt | ReturnStmt ;
+ControlFlow     = IfStmt | LoopStmt | SwitchStmt | TryStmt | ReturnStmt ;
 
 IfStmt          = "?" Expression Block [ ":" ( Block | IfStmt ) ] ;
 LoopStmt        = "&" ( VarDecl ";" Expression ";" Increment | Identifier ";" Expression ) Block ;
+SwitchStmt      = "?:" Expression "{" { CaseStmt } [ DefaultStmt ] "}" ;
+CaseStmt        = Pattern "=>" Block ;
+DefaultStmt     = ": =>" Block ;
 TryStmt         = "?try" Block [ ":ex" "(" TypeRef Identifier ")" Block ] [ ":fin" Block ] ;
 ReturnStmt      = "<=" Expression ;
 
@@ -58,6 +61,9 @@ Lambda          = "(" [ ParamList ] ")" "=>" Expression ;
 AwaitExpr       = "~" Identifier "(" [ { Expression } ] ")" ;
 TernaryExpr     = Expression "?" Expression ":" Expression ;
 NullConditional = Identifier "?." Identifier ;
+
+(* Patterns (for SwitchStmt) *)
+Pattern         = Identifier | Literal | TypeRef Identifier ;
 
 (* Literals *)
 Literal         = StringLit | NumberLit | BoolLit | NullLit | CollectionLit | MapLit ;
