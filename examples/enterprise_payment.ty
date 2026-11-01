@@ -8,14 +8,14 @@ use dependency 'masstransit' { version = '8.0' }
 
 // 1. Data Contracts (PII & GDPR protected)
 @struct payment_request {
-    @i32 order_id = 0
-    @f64 amount = 0.0
-    @s email = '' // [PII] will be masked in logs
-    @s card_token = '' // [Encrypt] at rest
+    order_id = @i32 0
+    amount = @f64 0.0
+    email = @s '' // [PII] will be masked in logs
+    card_token = @s '' // [Encrypt] at rest
 }
 
 @PaymentFailed : @Exception {
-    @s reason = ''
+    reason = @s ''
 }
 
 // 2. Gateway Interface
@@ -24,7 +24,7 @@ use dependency 'masstransit' { version = '8.0' }
 }
 
 @StripeGateway : #PaymentGateway {
-    @s api_key = @p @s
+    api_key = @s ''
     
     charge (@payment_request request) {
         // AI auto-generates Stripe SDK call
