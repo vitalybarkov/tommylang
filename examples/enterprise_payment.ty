@@ -54,8 +54,8 @@ create_payment (@payment_request request) {
     // 1. Charge (with CircuitBreaker & Retry)
     gateway = @StripeGateway { api_key = @secret('STRIPE_KEY') }
     success = gateway.charge(request)
-        :retry(3, 2s)
-        :circuit_breaker(failures = 5, reset = 30s)
+        .retry(3, 2s)
+        .circuit_breaker(failures = 5, reset = 30s)
     
     ? !success {
         throw @PaymentFailed('Card declined')
