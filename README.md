@@ -4,7 +4,7 @@
       <img src="TommyLangAvatar.png" width="256" alt="Tommy Logo">
     </td>
     <td valign="middle">
-      <h1>🏛 tommylang (Tommy): The Universal Architecture Language</h1>
+      <h1>🏛 tommylang: The AI Architecture Compiler</h1>
     </td>
   </tr>
 </table>
@@ -16,9 +16,9 @@
 **Are you tired of AI generating 500 lines of C# with missing dependencies and broken architecture?**
 **Are you spending hours reviewing AI-generated boilerplate?**
 
-**Tommy solves this.** It is an AI-native programming language designed for the era of Large Language Models. It does not replace C#, Python, or Rust. It **orchestrates** them.
+**Tommy solves this.** It is an **Architecture-as-Code** tool designed for the era of Large Language Models. It does not replace C#, Python, or Rust. It **orchestrates** them.
 
-Instead of writing boilerplate code, you write **Architectural Blueprints** (`.ty` files). One blueprint generates perfect, production-ready code across 12+ languages.
+Instead of writing code, you write **Architectural Blueprints** (`.ty` files). One blueprint generates production-ready microservices, database migrations, and infrastructure configs across 12+ languages.
 
 ---
 
@@ -27,18 +27,17 @@ Instead of writing boilerplate code, you write **Architectural Blueprints** (`.t
 2. [Quick Start](#-quick-start)
 3. [How it Works](#-how-it-works)
 4. [Core Features](#-core-features)
-5. [Examples](#-examples)
+5. [The "Killer" Example](#-the-killer-example)
 6. [Repository Structure](#-repository-structure)
 7. [Roadmap](#-roadmap)
-8. [Contributing](#-contributing)
 
 ---
 
 ## 🚀 Why Tommy?
 
-1. **Hallucination-Resistant:** Our prompt forces LLMs (GPT-4o, Claude 3.5) to act as strict AST compilers, not text generators.
-2. **Polyglot by Design:** Write once in `.ty`, transpile to C#, Python, Rust, Go, PHP, TypeScript, Solidity, and more.
-3. **Enterprise-Ready:** Built-in annotations for `[Saga]`, `[Outbox]`, `[GDPR]`, `[Kafka]`, and `[Telemetry]`.
+1. **Deterministic Architecture:** Our prompt forces LLMs (GPT-4o, Claude 3.5) to act as strict AST compilers. No more hallucinations about missing dependencies or broken DI.
+2. **Polyglot by Design:** Write once in `.ty`, transpile to C#, Python, Rust, Go, PHP, TypeScript, and more.
+3. **Enterprise-Ready:** Built-in annotations for `[Saga]`, `[Outbox]`, `[GDPR]`, `[Kafka]`, and `[OpenAPI]`.
 4. **Semantic Typography:** The official `TommyColor` VS Code theme uses color to separate Interfaces (Purple), Classes (Green), and Functions (Blue).
 
 ---
@@ -52,7 +51,7 @@ Instead of writing boilerplate code, you write **Architectural Blueprints** (`.t
 *(This theme colors your code so it looks like an architecture blueprint).*
 
 ### Step 2: Write the Blueprint (`.ty`)
-Create a file named `main.ty` and write your architecture using Tommy syntax:
+Create a file named `main.ty` and write your architecture:
 
 ```tommy
 @struct user_dto {
@@ -73,58 +72,32 @@ say_hello (@user_dto user) {
 ### Step 3: Transpile to Target Language
 
 **Option A: Using the CLI (Recommended)**
-"One command — ready code."
 1. Clone the repo and navigate to `cd cli`.
 2. Install the compiler: `pip install -e .`
 3. Set your API key (or use Ollama locally): 
    - OpenAI: `export OPENAI_API_KEY="your-key"`
-   - Ollama: `ollama run llama3` (in a separate terminal)
+   - Ollama: `ollama run llama3`
 4. Run the compiler:
    ```bash
-   # Using OpenAI
-   tommycli main.ty --target csharp
-   
-   # Using local Ollama (free, private)
-   tommycli main.ty --provider ollama --model llama3
+   tommycli main.ty --target csharp --trace
    ```
 
-*(Read the full [CLI documentation here](cli/README.md)).*
-
-**Option B: Manual AI Use (No Setup)**
+**Option B: Manual AI Use**
 1. Open ChatGPT or Claude.
-2. Copy the contents of **[`COMPILER_PROMPT.md`](COMPILER_PROMPT.md)** and paste it as a System Prompt.
-3. Paste your `main.ty` code and add the instruction: *"Target: C#"*.
-
-**The AI will generate:**
-1. A `<pre-flight>` architecture plan (checking security, DI scopes).
-2. UML diagrams (Mermaid & PlantUML).
-3. Production-ready C# code (or Python, Rust, etc.).
+2. Copy **[`COMPILER_PROMPT.md`](COMPILER_PROMPT.md)** as a System Prompt.
+3. Paste your `main.ty` code.
 
 ---
 
 ## 🧠 How it works
 
-Tommy is built on top of a meticulously crafted **System Prompt**. 
+Tommy is an AI Architecture Compiler built on top of a strictly crafted **System Prompt** and formal **EBNF Grammar**.
 
 ```text
-[Your .ty code] + [Tommy System Prompt] ---> [LLM] ---> [Clean Target Code + UML]
+[Your .ty code] -> [Parser & AST] -> [LLM System Prompt] -> [Clean Code + Infrastructure + UML]
 ```
 
-Because the prompt enforces strict rules (e.g., snake_case for functions, = for all data, no return types in implementations), the AI is forced to generate code that is identical in architecture across all target languages. While LLMs are still probabilistic, this Strict-API approach minimizes hallucinations to near zero.
-
-### The Difference: Plain AI vs. Tommy
-If you ask ChatGPT to build a microservice with Kafka, it generates 500 lines of boilerplate with missing dependencies. 
-
-With Tommy, you write this:
-```tommy
-[Kafka(topic = 'orders')]
-[Saga]
-process_order (@order_dto order) {
-    @db.query('INSERT INTO orders ...', { id = order.id })
-    [Event('order_created')].publish({ id = order.id })
-    <= ok('Processed')
-}
-```
+Because the prompt enforces strict rules (e.g., `snake_case` for functions, `=` for all data, no return types in implementations), the AI is forced to generate code that is identical in architecture across all target languages.
 
 **Why not just use C# directly?**
 If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-specific paradigms (`Task`, `var`, DI attributes). It often fails. Tommy is a clean, abstract blueprint. It contains zero language-specific boilerplate. The AI translates pure intent directly into the target language's idiomatic code.
@@ -133,15 +106,42 @@ If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-
 
 ## 💎 Core Features
 
-*   **Semantic Types:** `#Interface`, `@Class`, `@struct`, `@p` (property).
-*   **Built-in System Responses:** `ok()`, `created()`, `bad_request()`, `not_found()`, `server_error()`.
 *   **Enterprise Architecture:** `[Saga]`, `[Outbox]`, `[Idempotent]`, `[CircuitBreaker]`, `[RateLimit]`.
 *   **Security & Compliance:** `[Auth]`, `[Encrypt]`, `[PII]`, `[GDPR]`, `[AuditLog]`.
-*   **OS-Level (Bare-Metal):** `[NoRuntime]`, `[Ring(0)]`, `[Interrupt]` -> generates Rust `#![no_std]`.
+*   **Infrastructure as Code:** Generates Dockerfiles, Kubernetes manifests, and Terraform from the same blueprint.
 *   **AI & ML:** `[ML]`, `[Agent]`, `@llm.complete()`.
 *   **UML Generation:** `[UML]` -> generates Mermaid & PlantUML diagrams on the fly.
-*   **Traceability & Auditing:** Use the `--trace` flag in the CLI to generate a JSON map linking every `.ty` annotation (`[Saga]`, `[Idempotent]`) directly to its generated implementation file and line number.
+*   **Traceability & Auditing:** Use the `--trace` flag to generate a JSON map linking every `.ty` annotation directly to its generated implementation file and line number.
 *   **Multi-LLM Support:** Run with OpenAI (GPT-4o) or locally with Ollama.
+*   *(OS-level features like `[Ring(0)]` exist in the spec but are not the primary focus).*
+
+---
+
+## 🚀 The "Killer" Example
+
+Write 20 lines of Tommy:
+
+```tommy
+[Saga]
+[Outbox]
+[REST('/api/payments')]
+[Kafka(topic = 'payments')]
+[Auth(oauth2 = 'client_credentials')]
+[GDPR]
+create_payment (@order_dto order) {
+    @db.query('INSERT INTO payments ...', { id = order.id })
+    [Event('payment_created')].publish({ id = order.id })
+    <= ok('Processed')
+}
+```
+
+Get 2000+ lines of production-ready code:
+*   **C# ASP.NET Core Controller** with MassTransit (Saga) & Polly (Resilience).
+*   **PostgreSQL migrations** and Entity Framework Configurations.
+*   **Kafka Consumers** with the Outbox pattern implemented.
+*   **Dockerfile & Kubernetes YAML** for deployment.
+*   **OpenAPI (Swagger)** documentation.
+*   **Mermaid UML Diagrams** for your architecture.
 
 ---
 
@@ -149,38 +149,34 @@ If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-
 
 Explore the power of Tommy in the [`examples/`](examples/) folder:
 * [Basics](examples/basics.ty) — Variables, loops, and types.
-* [Collections](examples/collections.ty) — Lists, maps, and sets.
-* [OOP & Interfaces](examples/oop.ty) — Classes, properties, and UML.
 * [REST API](examples/api.ty) — Endpoints, caching, and security.
 * [Microservices](examples/microservice.ty) — Saga, Outbox, and Kafka.
-* [Concurrency](examples/concurrency.ty) — Async, mutexes, and channels.
 * [AI & ML](examples/ai_agent.ty) — XGBoost and LangChain agents.
-* [OS Kernel](examples/os_kernel.ty) — Bare-metal interrupts (Rust target).
 
 ---
 
 ## 📂 Repository Structure
 
-*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The actual "compiler" (System Prompt v18.6).
-*   **[SPECIFICATION.md](SPECIFICATION.md)** — The strict syntax and architectural rules of Tommy.
+*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The core logic (System Prompt v18.7).
+*   **[SPECIFICATION.md](SPECIFICATION.md)** — The strict syntax and architectural rules.
 *   **[GRAMMAR.md](GRAMMAR.md)** — Formal EBNF grammar.
-*   `examples/` — 8 production-ready `.ty` blueprints (from Basics to OS Kernel).
+*   `examples/` — Production-ready `.ty` blueprints.
 *   `cli/` — The `tommycli` compiler (Python). [Read the CLI Docs here](cli/README.md).
-*   `.github/workflows/` — CI/CD tests.
 
 ---
 
 ## 🗺 Roadmap
 
 Tommy is in early alpha. Here is what's coming next:
-* [x] **Formal Grammar (BNF):** A strict grammar specification for `.ty` files (Check `GRAMMAR.md`).
-* [ ] **LSP & Validator:** A Language Server to catch syntax errors before sending code to the LLM.
-* [x] **Multi-LLM Support:** Native support for Claude 3.5, Gemini Pro, and local models (Ollama) in `tommycli`.
-* [x] **CI/CD Tests:** Automated compilation tests for generated code.
+* [x] **Formal Grammar (BNF):** A strict grammar specification for `.ty` files.
+* [x] **Multi-LLM Support:** Native support for OpenAI and local Ollama.
+* [x] **Traceability:** JSON Evidence map for audits.
+* [ ] **AST Validator:** A native Python parser to catch syntax errors before hitting the LLM.
+* [ ] **Infrastructure Generation:** Built-in Terraform and Helm chart generation.
 
 ---
 
 ## 🤝 Contributing
-Tommy is open for architects, AI researchers, and developers. We believe that in the future, humans will design software, and AI will write the boilerplate. Tommy is the bridge between the two.
+Tommy is open for architects, AI researchers, and developers. We believe that in the future, humans will design software, and AI will write the implementation. Tommy is the bridge between the two.
 
 Read the **[SPECIFICATION.md](SPECIFICATION.md)** to learn the syntax and start writing blueprints.
