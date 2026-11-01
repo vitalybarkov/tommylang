@@ -4,6 +4,7 @@ import argparse
 import re
 import json
 from openai import OpenAI
+from .parser import validate_syntax
 
 # Determine the path to the COMPILER_PROMPT.md 
 PROMPT_FILE = "COMPILER_PROMPT.md"
@@ -50,13 +51,22 @@ def main():
         client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
         print("🦙 Using local Ollama instance (http://localhost:11434)")
 
-    print(f"🏛  tommylang compiler v0.3.0 (Multi-LLM Edition)")
+    print(f"🏛  tommylang compiler v0.4.0 (AST & Infra Edition)")
     print(f"📄 Blueprint: {args.file}")
     print(f"🎯 Target: {args.target.upper()}")
     print(f"🤖 Provider: {args.provider.upper()} | Model: {args.model}")
     if args.trace:
         print(f"🔍 Traceability: Enabled")
     print("-" * 50)
+
+    # --- V1: AST VALIDATION ---
+    print("🔍 Validating syntax (AST)...")
+    is_valid, error_msg = validate_syntax(args.file)
+    if not is_valid:
+        print(f"❌ SYNTAX ERROR:\n{error_msg}")
+        print("Transpilation aborted. LLM was not called.")
+        sys.exit(1)
+    print("✅ Syntax OK. Proceeding to LLM...")
 
     with open(args.file, "r", encoding="utf-8") as f:
         code = f.read()

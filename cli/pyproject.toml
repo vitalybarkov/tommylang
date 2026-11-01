@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tommycli"
-version = "0.3.0"
+version = "0.4.0"
 description = "The official compiler for the tommylang architecture blueprint."
 requires-python = ">=3.9"
 dependencies = [
     "openai>=1.0.0",
+    "lark>=1.1.0",
 ]
 
 [project.scripts]
