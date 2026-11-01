@@ -1,0 +1,87 @@
+// ==========================================
+// 🏛 THE KILLER EXAMPLE
+// 20 lines of Architecture -> 2000+ lines of Code + Infra
+// ==========================================
+
+use dependency 'stripe' { version = 'latest' }
+use dependency 'masstransit' { version = '8.0' }
+
+// 1. Data Contracts (PII & GDPR protected)
+@struct payment_request {
+    @i32 order_id = 0
+    @f64 amount = 0.0
+    @s email = '' // [PII] will be masked in logs
+    @s card_token = '' // [Encrypt] at rest
+}
+
+@PaymentFailed : @Exception {
+    @s reason = ''
+}
+
+// 2. Gateway Interface
+#IPaymentGateway {
+    charge (@payment_request request) {@bool}
+}
+
+@StripeGateway : #IPaymentGateway {
+    @s api_key = @p @s
+    
+    charge (@payment_request request) {
+        // AI auto-generates Stripe SDK call
+        response = ~stripe.charge(request.card_token, request.amount)
+        <= response.success
+    }
+}
+
+// 3. The Core Service (Saga + Outbox + Kafka + API)
+[Saga]
+[Outbox]
+[Idempotent(key = 'order_id')]
+[REST('/api/v1/payments')]
+[Auth(oauth2 = 'client_credentials')]
+[RateLimit(requests = 100, per = '1m')]
+[Telemetry]
+[GDPR]
+[PII(mask = true)]
+[OpenAPI]
+[Test]
+create_payment (@payment_request request) {
+    // Validation
+    ? request.amount <== 0.0 {
+        throw @PaymentFailed('Amount must be greater than zero')
+    }
+    
+    // 1. Charge (with CircuitBreaker & Retry)
+    gateway = @StripeGateway { api_key = @secret('STRIPE_KEY') }
+    success = gateway.charge(request)
+        :retry(3, 2s)
+        :circuit_breaker(failures = 5, reset = 30s)
+    
+    ? !success {
+        throw @PaymentFailed('Card declined')
+    }
+    
+    // 2. Save to DB (Parameterized SQL)
+    @db.query('INSERT INTO payments (order_id, amount, email) VALUES (@id, @amount, @email)', { 
+        id = request.order_id, 
+        amount = request.amount, 
+        email = request.email 
+    })
+    
+    // 3. Publish Event (Outbox ensures consistency)
+    [Kafka(topic = 'payment_events')].publish({ 
+        event = 'payment_created', 
+        order_id = request.order_id 
+    })
+    
+    <= created('Payment processed successfully')
+}
+
+// 4. Infrastructure (Docker + K8s)
+[Replicate(count = 3)]
+[Limits(cpu = '0.5', memory = '512MB')]
+[Cache(ttl = 60s, provider = 'redis')]
+get_payment_status (@i32 order_id) {
+    status = ~@cache.get('payment_' + order_id)
+    <= ok({ status = status })
+}

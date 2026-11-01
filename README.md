@@ -119,29 +119,21 @@ If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-
 
 ## 🚀 The "Killer" Example
 
-Write 20 lines of Tommy:
+Look at the [`examples/enterprise_payment.ty`](examples/enterprise_payment.ty) blueprint. It's just 70 lines of code. 
 
-```tommy
-[Saga]
-[Outbox]
-[REST('/api/payments')]
-[Kafka(topic = 'payments')]
-[Auth(oauth2 = 'client_credentials')]
-[GDPR]
-create_payment (@order_dto order) {
-    @db.query('INSERT INTO payments ...', { id = order.id })
-    [Event('payment_created')].publish({ id = order.id })
-    <= ok('Processed')
-}
-```
+When you run `tommycli enterprise_payment.ty --target csharp --trace`, the AI generates:
 
-Get 2000+ lines of production-ready code:
-*   **C# ASP.NET Core Controller** with MassTransit (Saga) & Polly (Resilience).
-*   **PostgreSQL migrations** and Entity Framework Configurations.
-*   **Kafka Consumers** with the Outbox pattern implemented.
-*   **Dockerfile & Kubernetes YAML** for deployment.
-*   **OpenAPI (Swagger)** documentation.
-*   **Mermaid UML Diagrams** for your architecture.
+1.  **C# Web API** with OAuth2, Rate Limiting, and OpenAPI (Swagger).
+2.  **MassTransit Saga** with a Kafka Outbox pattern.
+3.  **Stripe Integration** with Polly (Circuit Breaker + Retry).
+4.  **GDPR Compliance** (PII masking and Audit Logs).
+5.  **PostgreSQL Migrations** for the DB.
+6.  **Kubernetes Manifests** (`replicas: 3`, resource limits).
+7.  **Dockerfile** for deployment.
+8.  **xUnit Tests** for the API.
+9.  **Mermaid UML Sequence Diagram** for documentation.
+
+And because of the `--trace` flag, you get a `trace.json` that proves every constraint (like `[GDPR]` or `[Idempotent]`) was implemented.
 
 ---
 
