@@ -19,11 +19,11 @@ use dependency 'masstransit' { version = '8.0' }
 }
 
 // 2. Gateway Interface
-#IPaymentGateway {
+#PaymentGateway {
     charge (@payment_request request) {@bool}
 }
 
-@StripeGateway : #IPaymentGateway {
+@StripeGateway : #PaymentGateway {
     @s api_key = @p @s
     
     charge (@payment_request request) {
