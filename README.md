@@ -20,7 +20,7 @@
 
 **Tommy solves this.** It is an **Architecture-as-Code** tool designed for the era of Large Language Models. It does not replace C#, Python, or Rust. It **orchestrates** them.
 
-Instead of writing code, you write **Architectural Blueprints** (`.ty` files). One blueprint generates production-ready microservices, database migrations, and infrastructure configs across 12+ languages.
+Instead of writing code, you write **Architectural Blueprints** (`.ty` files). One blueprint generates production-ready microservices, database migrations, and infrastructure configs across multiple languages.
 
 ---
 
@@ -38,7 +38,7 @@ Instead of writing code, you write **Architectural Blueprints** (`.ty` files). O
 
 ## 🚀 Why Tommy?
 
-1. **Deterministic Architecture:** Our prompt forces LLMs (GPT-4o, Claude 3.5) to act as strict AST compilers. No more hallucinations about missing dependencies or broken DI.
+1. **Strict-API Compiler:** Our prompt forces LLMs (GPT-4o, Claude 3.5) to act as strict AST compilers. While LLMs are probabilistic, the Strict-API approach minimizes hallucinations.
 2. **Polyglot by Design:** Write once in `.ty`, transpile to C#, Python, Rust, Go, PHP, TypeScript, and more.
 3. **Enterprise-Ready:** Built-in annotations for `[Saga]`, `[Outbox]`, `[GDPR]`, `[Kafka]`, and `[OpenAPI]`.
 4. **Semantic Typography:** The official `TommyColor` VS Code theme uses color to separate Interfaces (Purple), Classes (Green), and Functions (Blue).
@@ -107,7 +107,7 @@ Because the prompt enforces strict rules (e.g., `snake_case` for functions, `=` 
 ## 💎 Core Features
 
 *   **Enterprise Architecture:** `[Saga]`, `[Outbox]`, `[Idempotent]`, `[CircuitBreaker]`, `[RateLimit]`.
-*   **Security & Compliance:** `[Auth]`, `[Encrypt]`, `[PII]`, `[GDPR]`, `[AuditLog]`.
+*   **Security & Audit-Ready:** `[Auth]`, `[Encrypt]`, `[PII]`, `[GDPR]`, `[AuditLog]`.
 *   **Infrastructure as Code:** Generates Dockerfiles, Kubernetes manifests, and Terraform from the same blueprint.
 *   **Testing:** Full xUnit (with Moq) and pytest generation with mocks.
 *   **UML Generation:** `[UML]` -> generates Mermaid & PlantUML diagrams on the fly.
@@ -118,19 +118,21 @@ Because the prompt enforces strict rules (e.g., `snake_case` for functions, `=` 
 
 ## 🚀 The "Killer" Example
 
-Look at the [`examples/enterprise_payment.ty`](examples/enterprise_payment.ty) blueprint. It's just 70 lines of code. 
+Look at the [`examples/enterprise_payment.ty`](examples/enterprise_payment.ty) blueprint. It's about 80 lines of code. 
 
 When you run `tommycli enterprise_payment.ty --target csharp --trace`, the AI generates:
 
 1.  **C# Web API** with OAuth2, Rate Limiting, and OpenAPI (Swagger).
 2.  **MassTransit Saga** with a Kafka Outbox pattern.
 3.  **Stripe Integration** with Polly (Circuit Breaker + Retry).
-4.  **GDPR Compliance** (PII masking and Audit Logs).
+4.  **PII Masking** and Audit Logs.
 5.  **PostgreSQL Migrations** for the DB.
 6.  **Kubernetes Manifests** (`replicas: 3`, resource limits).
 7.  **Dockerfile** for deployment.
 8.  **xUnit Tests** with real mocks for dependencies.
 9.  **Mermaid UML Sequence Diagram** for documentation.
+
+*(See the actual generated outputs in the [`examples/output/`](examples/output/) folder).*
 
 ---
 
@@ -150,10 +152,11 @@ The AI will strip away all language-specific boilerplate and generate a clean ar
 
 ## 📂 Repository Structure
 
-*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The core logic (System Prompt v20.0).
+*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The core logic (System Prompt v20.1).
 *   **[SPECIFICATION.md](SPECIFICATION.md)** — The strict syntax and architectural rules.
 *   **[GRAMMAR.md](GRAMMAR.md)** — Formal EBNF grammar.
 *   `examples/` — Production-ready `.ty` blueprints.
+*   `examples/output/` — Real generated outputs (C#, trace.json, Dockerfile).
 *   `cli/` — The `tommycli` compiler (Python). [Read the CLI Docs here](cli/README.md).
 
 ---
