@@ -11,6 +11,7 @@
 
 [![VS Code Theme](https://img.shields.io/badge/VS%20Code-TommyColor-blue?style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=TommyStore.tommycolor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/vitalybarkov/tommylang/actions/workflows/test.yml/badge.svg)](https://github.com/vitalybarkov/tommylang/actions/workflows/test.yml)
 
 **Are you tired of AI generating 500 lines of C# with missing dependencies and broken architecture?**
 **Are you spending hours reviewing AI-generated boilerplate?**
@@ -71,19 +72,28 @@ say_hello (@user_dto user) {
 
 ### Step 3: Transpile to Target Language
 
-**Option A: Manual AI Use (No Setup)**
-1. Open ChatGPT or Claude.
-2. Copy the contents of **[`COMPILER_PROMPT.md`](COMPILER_PROMPT.md)** and paste it as a System Prompt.
-3. Paste your `main.ty` code and add the instruction: *"Target: C#"*.
-
-**Option B: Using the CLI (Recommended)**
+**Option A: Using the CLI (Recommended)**
 "One command — ready code."
 1. Clone the repo and navigate to `cd cli`.
 2. Install the compiler: `pip install -e .`
-3. Set your API key: `export OPENAI_API_KEY="your-key"`
-4. Run the compiler: `tommycli main.ty --target csharp`
+3. Set your API key (or use Ollama locally): 
+   - OpenAI: `export OPENAI_API_KEY="your-key"`
+   - Ollama: `ollama run llama3` (in a separate terminal)
+4. Run the compiler:
+   ```bash
+   # Using OpenAI
+   tommycli main.ty --target csharp
+   
+   # Using local Ollama (free, private)
+   tommycli main.ty --provider ollama --model llama3
+   ```
 
 *(Read the full [CLI documentation here](cli/README.md)).*
+
+**Option B: Manual AI Use (No Setup)**
+1. Open ChatGPT or Claude.
+2. Copy the contents of **[`COMPILER_PROMPT.md`](COMPILER_PROMPT.md)** and paste it as a System Prompt.
+3. Paste your `main.ty` code and add the instruction: *"Target: C#"*.
 
 **The AI will generate:**
 1. A `<pre-flight>` architecture plan (checking security, DI scopes).
@@ -131,6 +141,7 @@ If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-
 *   **AI & ML:** `[ML]`, `[Agent]`, `@llm.complete()`.
 *   **UML Generation:** `[UML]` -> generates Mermaid & PlantUML diagrams on the fly.
 *   **Traceability & Auditing:** Use the `--trace` flag in the CLI to generate a JSON map linking every `.ty` annotation (`[Saga]`, `[Idempotent]`) directly to its generated implementation file and line number.
+*   **Multi-LLM Support:** Run with OpenAI (GPT-4o) or locally with Ollama.
 
 ---
 
@@ -150,20 +161,22 @@ Explore the power of Tommy in the [`examples/`](examples/) folder:
 
 ## 📂 Repository Structure
 
-*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The actual "compiler" (System Prompt v18.3).
+*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The actual "compiler" (System Prompt v18.6).
 *   **[SPECIFICATION.md](SPECIFICATION.md)** — The strict syntax and architectural rules of Tommy.
+*   **[GRAMMAR.md](GRAMMAR.md)** — Formal EBNF grammar.
 *   `examples/` — 8 production-ready `.ty` blueprints (from Basics to OS Kernel).
 *   `cli/` — The `tommycli` compiler (Python). [Read the CLI Docs here](cli/README.md).
+*   `.github/workflows/` — CI/CD tests.
 
 ---
 
 ## 🗺 Roadmap
 
 Tommy is in early alpha. Here is what's coming next:
-* [ ] **Formal Grammar (BNF):** A strict grammar specification for `.ty` files.
+* [x] **Formal Grammar (BNF):** A strict grammar specification for `.ty` files (Check `GRAMMAR.md`).
 * [ ] **LSP & Validator:** A Language Server to catch syntax errors before sending code to the LLM.
-* [ ] **Multi-LLM Support:** Native support for Claude 3.5, Gemini Pro, and local models (Ollama) in `tommycli`.
-* [ ] **CI/CD Tests:** Automated compilation tests for generated code.
+* [x] **Multi-LLM Support:** Native support for Claude 3.5, Gemini Pro, and local models (Ollama) in `tommycli`.
+* [x] **CI/CD Tests:** Automated compilation tests for generated code.
 
 ---
 
@@ -171,4 +184,3 @@ Tommy is in early alpha. Here is what's coming next:
 Tommy is open for architects, AI researchers, and developers. We believe that in the future, humans will design software, and AI will write the boilerplate. Tommy is the bridge between the two.
 
 Read the **[SPECIFICATION.md](SPECIFICATION.md)** to learn the syntax and start writing blueprints.
-```

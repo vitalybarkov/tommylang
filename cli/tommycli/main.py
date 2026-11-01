@@ -23,25 +23,37 @@ def main():
     )
     parser.add_argument("file", help="Path to the .ty blueprint file")
     parser.add_argument("--target", default="csharp", help="Target language (csharp, python, rust, go, php)")
-    parser.add_argument("--model", default="gpt-4o", help="OpenAI model to use (default: gpt-4o)")
+    parser.add_argument("--provider", default="openai", choices=["openai", "ollama"], help="LLM Provider (openai, ollama)")
+    parser.add_argument("--model", default=None, help="Model name. Defaults: gpt-4o (openai), llama3 (ollama)")
     parser.add_argument("--trace", action="store_true", help="Generate a traceability JSON mapping annotations to code lines")
     
     args = parser.parse_args()
+
+    # Set default models based on provider
+    if args.model is None:
+        args.model = "gpt-4o" if args.provider == "openai" else "llama3"
 
     if not os.path.exists(args.file):
         print(f"❌ File '{args.file}' not found.")
         sys.exit(1)
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("❌ Error: OPENAI_API_KEY environment variable is missing.")
-        print("Set it using: export OPENAI_API_KEY='your-key-here'")
-        sys.exit(1)
+    # --- API CONFIGURATION ---
+    if args.provider == "openai":
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("❌ Error: OPENAI_API_KEY environment variable is missing.")
+            print("Set it using: export OPENAI_API_KEY='your-key-here'")
+            sys.exit(1)
+        client = OpenAI(api_key=api_key)
+    elif args.provider == "ollama":
+        # Ollama uses an OpenAI-compatible API on localhost
+        client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+        print("🦙 Using local Ollama instance (http://localhost:11434)")
 
-    print(f"🏛  tommylang compiler v0.2.0 (Compliance Edition)")
+    print(f"🏛  tommylang compiler v0.3.0 (Multi-LLM Edition)")
     print(f"📄 Blueprint: {args.file}")
     print(f"🎯 Target: {args.target.upper()}")
-    print(f"🤖 Engine: {args.model}")
+    print(f"🤖 Provider: {args.provider.upper()} | Model: {args.model}")
     if args.trace:
         print(f"🔍 Traceability: Enabled")
     print("-" * 50)
@@ -50,7 +62,6 @@ def main():
         code = f.read()
 
     system_prompt = load_system_prompt()
-    client = OpenAI(api_key=api_key)
 
     print("⏳ Transpiling... (this may take 10-20 seconds)")
 
@@ -88,18 +99,34 @@ def main():
                 # --- COMPLIANCE CHECK ---
                 try:
                     trace_data = json.loads(trace_json_str)
-                    missing = [t for t in trace_data.get("trace", []) if t.get("verification_result") == "MISSING"]
+                    trace_array = trace_data.get("trace", [])
+                    
+                    if not isinstance(trace_array, list):
+                        trace_array = []
+
+                    missing = [t for t in trace_array if t.get("verification_result") == "MISSING"]
                     
                     if missing:
                         print("\n⚠️  ARCHITECTURE COMPLIANCE VIOLATION DETECTED!")
                         for m in missing:
-                            print(f"   - Constraint [{m['constraint_id']}] '{m['annotation']}' is MISSING in the generated code.")
+                            c_id = m.get('constraint_id', 'UNKNOWN')
+                            ann = m.get('annotation', 'UNKNOWN')
+                            print(f"   - Constraint [{c_id}] '{ann}' is MISSING in the generated code.")
                         print("   Please review the output carefully.\n")
                     else:
                         print("✅ Architecture Compliance: All constraints verified.\n")
                         
+                        # Print evidence links
+                        for t in trace_array:
+                            if t.get("target_file") and t.get("target_file") != "none":
+                                file_path = os.path.abspath(os.path.join("output", t['target_file']))
+                                print(f"   ↳ Evidence for {t.get('constraint_id', 'UNKNOWN')}: {file_path}:{t.get('target_line', 0)}")
+                        print("\n")
+                        
                 except json.JSONDecodeError:
                     print("⚠️ Warning: Could not parse trace JSON for compliance check.")
+                except Exception as e:
+                    print(f"⚠️ Warning: Unexpected error during compliance check: {e}")
 
                 # Remove JSON from the main output
                 output = output.replace(json_match.group(0), "")
