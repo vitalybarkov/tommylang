@@ -170,6 +170,7 @@ Tommy is in early alpha. Here is what's coming next:
 * [x] **AST Validator:** A native Python parser to catch syntax errors before hitting the LLM.
 * [x] **Infrastructure Generation:** Built-in Docker and Kubernetes generation.
 * [x] **Legacy Decompiler:** Reverse-engineer old C#/PHP into clean `.ty` blueprints.
+* [ ] **Semantic AST Validation:** Extend parser to validate semantics (e.g., annotations match function types).
 * [ ] **LSP & Validator (V5):** A Language Server for real-time IDE syntax checking.
 
 ---
