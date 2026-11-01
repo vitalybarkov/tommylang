@@ -22,11 +22,12 @@ def main():
         description="tommycli — The official Tommy Compiler",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    parser.add_argument("file", help="Path to the .ty blueprint file")
+    parser.add_argument("file", help="Path to the .ty blueprint file or legacy code file")
     parser.add_argument("--target", default="csharp", help="Target language (csharp, python, rust, go, php)")
     parser.add_argument("--provider", default="openai", choices=["openai", "ollama"], help="LLM Provider (openai, ollama)")
     parser.add_argument("--model", default=None, help="Model name. Defaults: gpt-4o (openai), llama3 (ollama)")
     parser.add_argument("--trace", action="store_true", help="Generate a traceability JSON mapping annotations to code lines")
+    parser.add_argument("--decompile", action="store_true", help="Reverse-engineer legacy code into a .ty blueprint")
     
     args = parser.parse_args()
 
@@ -51,40 +52,55 @@ def main():
         client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
         print("🦙 Using local Ollama instance (http://localhost:11434)")
 
-    print(f"🏛  tommylang compiler v0.4.0 (AST & Infra Edition)")
-    print(f"📄 Blueprint: {args.file}")
-    print(f"🎯 Target: {args.target.upper()}")
+    print(f"🏛  tommylang compiler v0.5.0 (Legacy & Testing Edition)")
+    print(f"📄 File: {args.file}")
+    
+    if args.decompile:
+        print(f"🔄 Mode: DECOMPILE (Legacy -> Tommy)")
+        print(f"🎯 Input Language: {args.target.upper()}")
+        target_ext = "ty"
+    else:
+        print(f"🎯 Target: {args.target.upper()}")
+        target_ext = args.target
+
     print(f"🤖 Provider: {args.provider.upper()} | Model: {args.model}")
     if args.trace:
         print(f"🔍 Traceability: Enabled")
     print("-" * 50)
 
-    # --- V1: AST VALIDATION ---
-    print("🔍 Validating syntax (AST)...")
-    is_valid, error_msg = validate_syntax(args.file)
-    if not is_valid:
-        print(f"❌ SYNTAX ERROR:\n{error_msg}")
-        print("Transpilation aborted. LLM was not called.")
-        sys.exit(1)
-    print("✅ Syntax OK. Proceeding to LLM...")
+    # --- V1: AST VALIDATION (Skip for decompile) ---
+    if not args.decompile:
+        print("🔍 Validating syntax (AST)...")
+        is_valid, error_msg = validate_syntax(args.file)
+        if not is_valid:
+            print(f"❌ SYNTAX ERROR:\n{error_msg}")
+            print("Transpilation aborted. LLM was not called.")
+            sys.exit(1)
+        print("✅ Syntax OK. Proceeding to LLM...")
 
     with open(args.file, "r", encoding="utf-8") as f:
         code = f.read()
 
     system_prompt = load_system_prompt()
 
-    print("⏳ Transpiling... (this may take 10-20 seconds)")
+    print("⏳ Processing... (this may take 10-20 seconds)")
 
     trace_instruction = ""
     if args.trace:
         trace_instruction = "\nIMPORTANT: Generate the trace JSON block as instructed in the system prompt."
+
+    # --- PROMPT CONSTRUCTION ---
+    if args.decompile:
+        user_prompt = f"Decompile this code into a clean Tommy (.ty) blueprint. Strip away all language-specific boilerplate. Input language: {args.target}\n\n{code}"
+    else:
+        user_prompt = f"Target: {args.target}\n{trace_instruction}\n\n{code}"
 
     try:
         response = client.chat.completions.create(
             model=args.model,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Target: {args.target}\n{trace_instruction}\n\n{code}"}
+                {"role": "user", "content": user_prompt}
             ],
             temperature=0.1
         )
@@ -144,7 +160,7 @@ def main():
                 print("⚠️ Warning: --trace was requested but no JSON block was found in the response.")
 
         # Save the main code
-        out_filename = os.path.join("output", f"{os.path.basename(args.file).split('.')[0]}.{args.target}.md")
+        out_filename = os.path.join("output", f"{os.path.basename(args.file).split('.')[0]}.{target_ext}.md")
         
         with open(out_filename, "w", encoding="utf-8") as f:
             f.write(output.strip())

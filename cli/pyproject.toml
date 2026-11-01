@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tommycli"
-version = "0.4.0"
+version = "0.5.0"
 description = "The official compiler for the tommylang architecture blueprint."
 requires-python = ">=3.9"
 dependencies = [

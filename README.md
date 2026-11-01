@@ -28,8 +28,9 @@ Instead of writing code, you write **Architectural Blueprints** (`.ty` files). O
 3. [How it Works](#-how-it-works)
 4. [Core Features](#-core-features)
 5. [The "Killer" Example](#-the-killer-example)
-6. [Repository Structure](#-repository-structure)
-7. [Roadmap](#-roadmap)
+6. [Legacy Modernization](#-legacy-modernization)
+7. [Repository Structure](#-repository-structure)
+8. [Roadmap](#-roadmap)
 
 ---
 
@@ -48,7 +49,6 @@ Instead of writing code, you write **Architectural Blueprints** (`.ty` files). O
 1. Open VS Code.
 2. Go to Extensions (`Ctrl+Shift+X`).
 3. Search for **[TommyColor](https://marketplace.visualstudio.com/items?itemName=TommyStore.tommycolor)** and install it.
-*(This theme colors your code so it looks like an architecture blueprint).*
 
 ### Step 2: Write the Blueprint (`.ty`)
 Create a file named `main.ty` and write your architecture:
@@ -61,6 +61,7 @@ Create a file named `main.ty` and write your architecture:
 
 [REST('/api/hello')]
 [Cache(ttl = 60s)]
+[Test]
 say_hello (@user_dto user) {
     ? user.name == '' {
         <= bad_request('Name is required')
@@ -94,13 +95,10 @@ say_hello (@user_dto user) {
 Tommy is an AI Architecture Compiler built on top of a strictly crafted **System Prompt** and formal **EBNF Grammar**.
 
 ```text
-[Your .ty code] -> [Parser & AST] -> [LLM System Prompt] -> [Clean Code + Infrastructure + UML]
+[Your .ty code] -> [AST Parser] -> [LLM System Prompt] -> [Code + Infra + Tests + UML]
 ```
 
 Because the prompt enforces strict rules (e.g., `snake_case` for functions, `=` for all data, no return types in implementations), the AI is forced to generate code that is identical in architecture across all target languages.
-
-**Why not just use C# directly?**
-If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-specific paradigms (`Task`, `var`, DI attributes). It often fails. Tommy is a clean, abstract blueprint. It contains zero language-specific boilerplate. The AI translates pure intent directly into the target language's idiomatic code.
 
 ---
 
@@ -109,11 +107,10 @@ If you write C# and ask AI to translate it to Rust, the AI has to filter out C#-
 *   **Enterprise Architecture:** `[Saga]`, `[Outbox]`, `[Idempotent]`, `[CircuitBreaker]`, `[RateLimit]`.
 *   **Security & Compliance:** `[Auth]`, `[Encrypt]`, `[PII]`, `[GDPR]`, `[AuditLog]`.
 *   **Infrastructure as Code:** Generates Dockerfiles, Kubernetes manifests, and Terraform from the same blueprint.
-*   **AI & ML:** `[ML]`, `[Agent]`, `@llm.complete()`.
+*   **Testing:** Full xUnit (with Moq) and pytest generation with mocks.
 *   **UML Generation:** `[UML]` -> generates Mermaid & PlantUML diagrams on the fly.
 *   **Traceability & Auditing:** Use the `--trace` flag to generate a JSON map linking every `.ty` annotation directly to its generated implementation file and line number.
 *   **Multi-LLM Support:** Run with OpenAI (GPT-4o) or locally with Ollama.
-*   *(OS-level features like `[Ring(0)]` exist in the spec but are not the primary focus).*
 
 ---
 
@@ -130,26 +127,28 @@ When you run `tommycli enterprise_payment.ty --target csharp --trace`, the AI ge
 5.  **PostgreSQL Migrations** for the DB.
 6.  **Kubernetes Manifests** (`replicas: 3`, resource limits).
 7.  **Dockerfile** for deployment.
-8.  **xUnit Tests** for the API.
+8.  **xUnit Tests** with real mocks for dependencies.
 9.  **Mermaid UML Sequence Diagram** for documentation.
-
-And because of the `--trace` flag, you get a `trace.json` that proves every constraint (like `[GDPR]` or `[Idempotent]`) was implemented.
 
 ---
 
-## 📂 Examples
+## 🔄 Legacy Modernization
 
-Explore the power of Tommy in the [`examples/`](examples/) folder:
-* [Basics](examples/basics.ty) — Variables, loops, and types.
-* [REST API](examples/api.ty) — Endpoints, caching, and security.
-* [Microservices](examples/microservice.ty) — Saga, Outbox, and Kafka.
-* [AI & ML](examples/ai_agent.ty) — XGBoost and LangChain agents.
+Tommy is not just for new projects. It acts as an **Architectural Filter** for legacy code.
+
+Use the `--decompile` flag to reverse-engineer a 10-year-old spaghetti C# or PHP file into a clean `.ty` blueprint:
+
+```bash
+tommycli legacy_monolith.cs --decompile --target csharp
+```
+
+The AI will strip away all language-specific boilerplate and generate a clean architecture file. You can then transpile this blueprint into modern Rust, Go, or .NET 8 code.
 
 ---
 
 ## 📂 Repository Structure
 
-*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The core logic (System Prompt v18.7).
+*   **[COMPILER_PROMPT.md](COMPILER_PROMPT.md)** — The core logic (System Prompt v20.0).
 *   **[SPECIFICATION.md](SPECIFICATION.md)** — The strict syntax and architectural rules.
 *   **[GRAMMAR.md](GRAMMAR.md)** — Formal EBNF grammar.
 *   `examples/` — Production-ready `.ty` blueprints.
@@ -163,8 +162,10 @@ Tommy is in early alpha. Here is what's coming next:
 * [x] **Formal Grammar (BNF):** A strict grammar specification for `.ty` files.
 * [x] **Multi-LLM Support:** Native support for OpenAI and local Ollama.
 * [x] **Traceability:** JSON Evidence map for audits.
-* [ ] **AST Validator:** A native Python parser to catch syntax errors before hitting the LLM.
-* [ ] **Infrastructure Generation:** Built-in Terraform and Helm chart generation.
+* [x] **AST Validator:** A native Python parser to catch syntax errors before hitting the LLM.
+* [x] **Infrastructure Generation:** Built-in Docker and Kubernetes generation.
+* [x] **Legacy Decompiler:** Reverse-engineer old C#/PHP into clean `.ty` blueprints.
+* [ ] **LSP & Validator (V5):** A Language Server for real-time IDE syntax checking.
 
 ---
 
