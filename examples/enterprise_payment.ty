@@ -1,6 +1,6 @@
 // ==========================================
 // 🏛 THE KILLER EXAMPLE
-// 20 lines of Architecture -> 2000+ lines of Code + Infra
+// 100 lines of Architecture -> 1000+ lines of Code + Infra
 // ==========================================
 
 use dependency 'stripe' { version = 'latest' }
