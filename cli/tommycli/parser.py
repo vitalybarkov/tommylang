@@ -43,7 +43,7 @@ loop_stmt: "&" expr ";" expr ";" expr block
 return_stmt: "<=" (expr | func_call | object_init)
 
 // Exceptions
-try_stmt: "?try" block [":ex" "(" "@" IDENTIFIER IDENTIFIER ")" block] [":fin" block]
+try_stmt: "try" block [ "ex" "(" "@" IDENTIFIER IDENTIFIER ")" block ] [ "fin" block ]
 
 // Blocks
 block: "{" statement* "}"

@@ -50,7 +50,7 @@ LoopStmt        = "&" ( VarDecl ";" Expression ";" Increment | Identifier ";" Ex
 SwitchStmt      = "?:" Expression "{" { CaseStmt } [ DefaultStmt ] "}" ;
 CaseStmt        = Pattern "=>" Block ;
 DefaultStmt     = ": =>" Block ;
-TryStmt         = "?try" Block [ ":ex" "(" TypeRef Identifier ")" Block ] [ ":fin" Block ] ;
+TryStmt         = "try" Block [ "ex" "(" TypeRef Identifier ")" Block ] [ "fin" Block ] ;
 ReturnStmt      = "<=" Expression ;
 
 (* Expressions *)

@@ -8,14 +8,14 @@ use dependency 'masstransit' { version = '8.0' }
 
 // 1. Data Contracts (PII & GDPR protected)
 @struct payment_request {
-    order_id = @i32 0
-    amount = @f64 0.0
-    email = @s '' // [PII] will be masked in logs
-    card_token = @s '' // [Encrypt] at rest
+    order_id    = @i32 0
+    amount      = @f64 0.0
+    email       = @s '' // [PII] will be masked in logs
+    card_token  = @s '' // [Encrypt] at rest
 }
 
 @PaymentFailed : @Exception {
-    reason = @s ''
+    reason      = @s ''
 }
 
 // 2. Gateway Interface

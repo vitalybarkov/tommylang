@@ -1,6 +1,6 @@
 ---
 
-# 📜 Tommy Language Specification (v18.3)
+# 📜 Tommy Language Specification (v20.3)
 
 Tommy is designed to be a **monotonic**, strictly-typed language that acts as a blueprint for AI code generation. It removes ambiguity, forcing LLMs to output identical architectural patterns across all target languages.
 
@@ -12,7 +12,7 @@ Tommy uses semantic typography to reduce cognitive load. The official VS Code th
 | Entity | Color | Hex | Example |
 | :--- | :--- | :--- | :--- |
 | **Classes / Structs** | 🟢 Green | `#4EC9B0` | `@UserService` |
-| **Interfaces** | 🟣 Purple | `#C586C0` | `#IPaymentGateway` |
+| **Interfaces** | 🟣 Purple | `#C586C0` | `#PaymentGateway` |
 | **Functions / Methods** | 🔵 Blue | `#569CD6` | `get_user()` |
 | **Variables / Parameters** | ⚪ White | `#D4D4D4` | `user_id` |
 | **Content (Strings/Numbers)** | 🟡 Sandy | `#CE9178` | `'active'`, `42` |
@@ -63,7 +63,7 @@ user_map = @map<@i32, @s> { 1: 'one', 2: 'two' }
 ### Interfaces (`#`)
 Contracts containing only method signatures. Return types MUST be specified in curly braces here.
 ```tommy
-#IPaymentGateway {
+#PaymentGateway {
     charge (@user_dto user, @f64 amount) {@bool}
 }
 ```
@@ -71,8 +71,8 @@ Contracts containing only method signatures. Return types MUST be specified in c
 ### Classes (`@`) & Structs (`@struct`)
 Implementations. **Return types are NEVER specified in implementations** (they are inferred from `<=`).
 ```tommy
-@StripeGateway : #IPaymentGateway {
-    api_key = @p @s // Property
+@StripeGateway : #PaymentGateway {
+    api_key = @p @s '' // Property
     
     charge (@user_dto user, @f64 amount) {
         <= true // Return type inferred as @bool
@@ -141,13 +141,13 @@ handle_hardware_irq (@i32 irq_number) {
 
 ### Control Flow Syntax
 ```tommy
-?try {
+try {
     data = ~@db.query('SELECT ...')
 }
-:ex (@DatabaseError e) {
+ex (@DatabaseError e) {
     log(e.message)
 }
-:fin {
+fin {
     log('done')
 }
 

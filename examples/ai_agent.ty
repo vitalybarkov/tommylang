@@ -17,12 +17,15 @@
     tools = @c<@s> { 'refund', 'check_status' }
     
     handle_query (@s question) {
-        ?try {
+        try {
             response = ~llm.complete('User asks: ' + question)
             <= ok(response)
         }
-        :ex (e) {
+        ex (e) {
             <= server_error('LLM unavailable')
+        }
+        fin {
+
         }
     }
 }
