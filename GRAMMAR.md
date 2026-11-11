@@ -45,7 +45,7 @@ CollectionType  = "@c" | "@map" | "@set" | "@queue" ;
 Block           = "{" { Statement } "}" ;
 ControlFlow     = IfStmt | LoopStmt | SwitchStmt | TryStmt | ReturnStmt ;
 
-IfStmt          = "?" Expression Block [ ":" ( Block | IfStmt ) ] ;
+IfStmt          = "?" Expression Block { ":" Expression Block } [ ":" Block ] ;
 LoopStmt        = "&" ( VarDecl ";" Expression ";" Increment | Identifier ";" Expression ) Block ;
 SwitchStmt      = "?:" Expression "{" { CaseStmt } [ DefaultStmt ] "}" ;
 CaseStmt        = Pattern "=>" Block ;

@@ -1,6 +1,6 @@
 ---
 
-# 📜 Tommy Language Specification (v20.3)
+# 📜 Tommy Language Specification (v20.5)
 
 Tommy is designed to be a **monotonic**, strictly-typed language that acts as a blueprint for AI code generation. It removes ambiguity, forcing LLMs to output identical architectural patterns across all target languages.
 

@@ -38,7 +38,7 @@ func_args: func_arg ("," func_arg)*
 func_arg: IDENTIFIER | STRING | NUMBER | "@" IDENTIFIER | object_init | IDENTIFIER "=" (STRING | NUMBER | IDENTIFIER | "@" IDENTIFIER | func_call)
 
 // Control Flow
-if_stmt: "?" expr block [ ":" (block | if_stmt) ]
+if_stmt: "?" expr block { ":" expr block } [ ":" block ]
 loop_stmt: "&" expr ";" expr ";" expr block
 return_stmt: "<=" (expr | func_call | object_init)
 
